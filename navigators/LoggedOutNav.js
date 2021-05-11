@@ -13,6 +13,10 @@ export default function LoggedOutNav() {
       mode="card"
       screenOptions={{
         headerBackTitleVisible: false,
+        headerTitle: false,
+        headerTransparent: true,
+        // headerTransparent 헤더 투명으로 만들어서 칸구분 없는척하기 보이지만 않는거
+        headerTintColor: "white",
       }}
     >
       <Stack.Screen
@@ -23,16 +27,7 @@ export default function LoggedOutNav() {
         component={Welcome}
       />
       <Stack.Screen name="LogIn" component={LogIn} />
-      <Stack.Screen
-        options={{
-          headerTitle: false,
-          headerTransparent: true,
-          // headerTransparent 헤더 투명으로 만들어서 칸구분 없는척하기 보이지만 않는거
-          headerTintColor: "white",
-        }}
-        name="CreateAccount"
-        component={CreateAccount}
-      />
+      <Stack.Screen name="CreateAccount" component={CreateAccount} />
     </Stack.Navigator>
   );
 }
