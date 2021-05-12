@@ -6,6 +6,12 @@ import {
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { offsetLimitPagination } from "@apollo/client/utilities";
+import {
+  AsyncStorageWrapper,
+  CachePersistor,
+  persistCache,
+} from "apollo3-cache-persist";
 
 export const isLoggedInVar = makeVar(false);
 //새로고침시 디폴트는 항상 false.. 그래서 토큰유무에따라 바꿔줘야함 app,js에서
@@ -33,6 +39,8 @@ export const logUserOut = async () => {
   await AsyncStorage.removeItem(TOKEN);
   isLoggedInVar(false);
   tokenVar(null);
+  client.clearStore();
+  //clear를 통해 로그아웃시 모든 캐쉬내역 삭제!!
 };
 
 const httpLink = createHttpLink({
@@ -58,10 +66,26 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
+export const cache = new InMemoryCache({
+  typePolicies: {
+    Query: {
+      fields: {
+        seeFeed: offsetLimitPagination(),
+        //offsetLimitPagination 이 밑의 두개를 결합한것임!!
+        // keyArgs:false <-인자에 따라 따로따로 저장하지마세요!!
+        // merge(existing = [], incoming = []) {
+        //   return [...existing, ...incoming];
+        // },
+      },
+    },
+  },
+});
+
 const client = new ApolloClient({
   link: authLink.concat(httpLink),
-  cache: new InMemoryCache(),
+  cache,
 });
+
 export default client;
 
 // const client = new ApolloClient({

@@ -14,7 +14,7 @@ Platform:
   win32 x64
 
 Trace: 
-  Error: EPERM: operation not permitted, unlink 'C:\Users\818396\Desktop\my_project\Nproject\NewKwangStagram_mobile\node_modules\@babel\helper-compilation-targets\node_modules\.bin'
+  Error: EPERM: operation not permitted, unlink 'C:\Users\818396\Desktop\my_project\Nproject\NewKwangStagram_mobile\node_modules\@babel\generator\node_modules\.bin'
 
 npm manifest: 
   {
@@ -32,6 +32,7 @@ npm manifest:
       "@react-navigation/bottom-tabs": "^5.11.10",
       "@react-navigation/native": "^5.9.4",
       "@react-navigation/stack": "^5.14.4",
+      "apollo3-cache-persist": "^0.9.1",
       "expo": "~41.0.1",
       "expo-app-loading": "^1.0.3",
       "expo-asset": "~8.3.1",
@@ -2141,6 +2142,11 @@ Lockfile:
     dependencies:
       micromatch "^3.1.4"
       normalize-path "^2.1.1"
+  
+  apollo3-cache-persist@^0.9.1:
+    version "0.9.1"
+    resolved "https://registry.yarnpkg.com/apollo3-cache-persist/-/apollo3-cache-persist-0.9.1.tgz#191d9d93666a31b8921cce1b2d61ac0b6578540f"
+    integrity sha512-A6/SdCJmGLMLrL+mlsIijP3G+V7NvyG6likhkmTQBibU/+69UWxVs2qb7peYGOdiPT5QsxcaujDVCEgLzqC2OA==
   
   argparse@^1.0.7:
     version "1.0.10"

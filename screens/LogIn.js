@@ -78,6 +78,7 @@ export default function Login({ route: { params } }) {
         onSubmitEditing={() => onNext(passwordRef)}
         onChangeText={(text) => setValue("username", text)}
         //onChangeText(네이티브만있음)방금 바뀐 text를 arg로 준다!
+        //state에 username에  text 값을 할당하고.. useEffect에서 register해주면된다!
       />
       <TextInput
         ref={passwordRef}

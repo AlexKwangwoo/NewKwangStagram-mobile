@@ -5,11 +5,12 @@ import * as Font from "expo-font";
 import { Asset } from "expo-asset";
 import LoggedOutNav from "./navigators/LoggedOutNav";
 import { NavigationContainer } from "@react-navigation/native";
-import { AppearanceProvider } from "react-native-appearance";
+// import { AppearanceProvider } from "react-native-appearance";
 import { ApolloProvider, useReactiveVar } from "@apollo/client";
-import client, { isLoggedInVar, tokenVar } from "./apollo";
+import client, { isLoggedInVar, tokenVar, cache } from "./apollo";
 import LoggedInNav from "./navigators/LoggedInNav";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AsyncStorageWrapper, persistCache } from "apollo3-cache-persist";
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -38,7 +39,7 @@ export default function App() {
   };
 
   const preload = async () => {
-    //앱이 실행되기전에 미리 작동해야하는것들!!!
+    //ApolloProvider, 앱이 실행되기전에 미리 작동해야하는것들!!!
     const token = await AsyncStorage.getItem("token");
     // 지울땐 removeItem or multiRomove 이용하기
     // 새로고침해도.. 토큰이 저장되어있으면 isLoggedInVar가 false에서true로됨!!
@@ -47,6 +48,18 @@ export default function App() {
       tokenVar(token);
       // logUserIn와 비슷한기능을 다시한번더 해주는것임!
     }
+
+    //문제는 다른사람 로그인하면..이전사람들캐쉬보여서 캐쉬리셋해야한다
+    // client.clearStore(); 통해 로그아웃시 지워줄것임! 근데 오류가생기네... 했다가 다시잘됨
+    await persistCache({
+      cache,
+      //아폴로에서 우리가 만든 캐쉬를 가져온다!
+      storage: new AsyncStorageWrapper(AsyncStorage),
+      serialize: false,
+      //내가 스키마 좀 바꿔주면 에러생기는데 여길통해 통과시켜준다
+      //캐쉬가 자동업데이트되게할려면 저렇게 해야함..
+    });
+
     return preloadAssets();
     //preloadAssets은 promise를 리턴해야함
   };

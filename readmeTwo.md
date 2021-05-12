@@ -19,7 +19,7 @@
 3. - npm install --global expo-cli
    - expo init NewKwangStagram_mobile
      managed workflow에서 blank로 갈것임.
-   - expo install expo-app-loading
+   - expo install expo-app-loading 또는.. npm i --save-dev @types/expo-app-loading
      (뭔가 인스톨할때 앱 멈추게안한다)
    - expo install expo-font
    - expo install expo-asset asset에 있는 친구를 쓰기위해
@@ -31,6 +31,7 @@
    - npm install react-hook-form
    - npm install @apollo/client graphql
    - npm install @react-navigation/bottom-tabs
+   - expo install @react-native-async-storage/async-storage
 
 4. view는 div고 text는 span임!
 
@@ -165,3 +166,62 @@
 
 33. 링크 이동시켜줄 navigation.navigate("Profile") 할때
     props로 받아도 되고 이렇게 useNavigation써도된다!! photo에 해놨음!
+
+34. 새로 고침을 하기 위해서는
+    refreshing={refreshing}
+    //refreshing이 작동하기위해서는 onRefresh가 필요하다! refreshing가 true돼야 리프레쉬됨
+    onRefresh={refresh}
+    //onRefresh는 우리가 당겼을때 새로 실행될 함수를 말한다!
+    두가지가 필요하다!
+
+    const { data, loading, refetch, fetchMore } = useQuery(FEED_QUERY, {
+    //fetchMore 은 더많은 결과를 새로운 변수와 함께 fetch할수있게 해줌
+    //또한 기존의 데이터를 유지한체 새로운 데이터를 가져옴!
+    <ScrollView 스크롤 뷰랑 flatList랑 리프레쉬 방법이 다름
+    refreshControl={
+    <RefreshControl onRefresh={onRefresh} refreshing={refreshing} />
+    }
+
+35. seeFeed에서 모바일할때 2개를 보고 스킵갯수는 seeFeed데이터길이 만큼 offset으로 설정하여
+    페이지 내릴때마다 건너뛰어서 사진을 받을수있음.. 그러나 문제는 fetchMore 해주면 반응이 일어나야하는데
+    fetchMore 로는 render가 일어나지않는다.. 즉 화면상에 새롭게 보여줄게 없다는거다 왜냐하면
+    우리는 현재 seeFeed.offset:0로 화면을 맨처음 만들었는데 여기서 seeFeed.offset:2로 변해야지만
+    리렌더가 일어날텐데 업데이트가 아니라 seeFeed.offset:0 도있고 seeFeed.offset:2 도있어서
+    리랜더 이유를 못느껴서 컴포넌트가 가만히 있음.. 그래서 저두게 가 같은거고 업데이트 된거라고 아폴로
+    캐쉬한테 말해줘야함!
+    // keyArgs:false <-인자에 따라 따로따로 저장하지마세요!!
+
+    merge(existing = [], incoming = []) { <-이걸통해 이전데이터와 붙여줌
+    // return [...existing, ...incoming];
+    // },
+
+36. npm i apollo3-cache-persist
+    앱을쓰다가 다른앱쓰고 다시 원래 쓰던 앱왔을때 로딩이 안뜨고 그전에 봤던 일들을 할수있는 이유는
+    cache의 persistence가 있기 때문이다 미리 우리폰의 하드 드라이브 같은 저장소들에 저장되도록 만들었다.
+
+37. <FlatList
+    ItemSeparatorComponent={() => (
+    // 월래있는 함수이며.. 아이탬겹치는곳만 선을 만들어줌.. 맨위와 마지막은 선없음!!
+    <View
+    style={{
+              width: "100%",
+              height: 1,
+              backgroundColor: "rgba(255, 255, 255, 0.2)",
+            }} ></View>
+    )}
+    />
+
+38. navigation.setOptions({
+    title: data?.me?.username,
+    }); 을 통해 내가 갈려는곳의 타이틀을 바꿔줄수있다!
+
+39. 리엑트네이티브에서는 이미지 가져올때 너비와 높이 필수임!
+
+40. const [startQueryFn, { loading, data }] = useLazyQuery(SEARCH_PHOTOS);
+    //useQuery는 자동으로 실행되는데.. 유저가 키보드 검색을 누를때만 작동시키고 싶음!!
+    컴포넌트가 mount될때 바로 실행됨.. 그래서 레이지 씀
+    startQueryFn은 lazyQuery가 작동될 트리거임
+
+41. {조건문 ? (A : (조건문 ? (B : C))): D} 도가능
+
+42.
