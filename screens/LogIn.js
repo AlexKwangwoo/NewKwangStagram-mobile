@@ -39,7 +39,7 @@ export default function Login({ route: { params } }) {
     }
   };
 
-  const [logInMutation, { loading }] = useMutation(LOGIN_MUTATION, {
+  const [logInMutation, { loading, error }] = useMutation(LOGIN_MUTATION, {
     onCompleted,
   });
 

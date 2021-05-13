@@ -1,99 +1,46 @@
 import React from "react";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Image, View } from "react-native";
-import TabIcon from "../components/nav/TabIcon";
-import SharedStackNav from "./SharedStackNav";
-import useMe from "../hooks/useMe";
+import { Ionicons } from "@expo/vector-icons";
+import { createStackNavigator } from "@react-navigation/stack";
+import TabsNav from "./TabsNav";
+import UploadNav from "./UploadNav";
+import UploadForm from "../screens/UploadForm";
 
-const Tabs = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 export default function LoggedInNav() {
-  const { data } = useMe();
-
   return (
-    <Tabs.Navigator
-      tabBarOptions={{
-        activeTintColor: "white",
-        // 메뉴가 선택됬을때 글자색
-        showLabel: false,
-        //메뉴 글자 없애기
-        style: {
-          borderTopColor: "rgba(255, 255, 255, 0.3)",
-          backgroundColor: "black",
-        },
-        // tabStyle: {
-        //   backgroundColor: "red",
-        // },
-      }}
+    <Stack.Navigator
+      mode="modal"
+      // headerMode="none"
+      // headerMode none안하면 헤더포함된 스택에 다른스택이 포함된 탭이 들어가 두개의 헤더가된다!
+      //근데 업로드 화면에서는 보여주게 하고싶은데.. 이유는 next와 before같은 버튼을 화면 맨위에
+      //놓기위해서.. 그래서 일단 보여주게 하고 안보여주고 싶은 친구들만 밑에와같이 false로 한다!
     >
-      <Tabs.Screen
-        name="Feed"
-        // component={Feed}
-        options={{
-          tabBarIcon: ({ focused, color, size }) => (
-            //탑바아이콘은 3개의 변수를 받을수있음!
-            <TabIcon iconName={"home"} color={color} focused={focused} />
-          ),
-        }}
-      >
-        {() => <SharedStackNav screenName="Feed" />}
-      </Tabs.Screen>
-      <Tabs.Screen
-        name="Search"
-        // component={Search}
-        options={{
-          tabBarIcon: ({ focused, color, size }) => (
-            <TabIcon iconName={"search"} color={color} focused={focused} />
-          ),
-        }}
-      >
-        {() => <SharedStackNav screenName="Search" />}
-      </Tabs.Screen>
-
-      <Tabs.Screen
-        name="Camera"
-        component={View}
-        options={{
-          tabBarIcon: ({ focused, color, size }) => (
-            <TabIcon iconName={"camera"} color={color} focused={focused} />
-          ),
-        }}
+      <Stack.Screen
+        name="Tabs"
+        options={{ headerShown: false }}
+        component={TabsNav}
       />
-
-      <Tabs.Screen
-        name="Notifications"
-        // component={Notifications}
+      <Stack.Screen
+        name="Upload"
+        options={{ headerShown: false }}
+        component={UploadNav}
+      />
+      <Stack.Screen
+        name="UploadForm"
         options={{
-          tabBarIcon: ({ focused, color, size }) => (
-            <TabIcon iconName={"heart"} color={color} focused={focused} />
+          headerBackTitleVisible: false,
+          headerBackImage: ({ tintColor }) => (
+            <Ionicons color={tintColor} name="close" size={28} />
           ),
+          title: "Upload",
+          headerTintColor: "white",
+          headerStyle: {
+            backgroundColor: "black",
+          },
         }}
-      >
-        {() => <SharedStackNav screenName="Notifications" />}
-      </Tabs.Screen>
-
-      <Tabs.Screen
-        name="Me"
-        // component={Profile}
-        options={{
-          tabBarIcon: ({ focused, color, size }) =>
-            data?.me?.avatar ? (
-              <Image
-                source={{ uri: data.me.avatar }}
-                style={{
-                  height: 20,
-                  width: 20,
-                  borderRadius: 10,
-                  ...(focused && { borderColor: "white", borderWidth: 1 }),
-                }}
-              />
-            ) : (
-              <TabIcon iconName={"person"} color={color} focused={focused} />
-            ),
-        }}
-      >
-        {() => <SharedStackNav screenName="Me" />}
-      </Tabs.Screen>
-    </Tabs.Navigator>
+        component={UploadForm}
+      />
+    </Stack.Navigator>
   );
 }

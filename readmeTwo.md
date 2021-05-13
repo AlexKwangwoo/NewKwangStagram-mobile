@@ -1,66 +1,70 @@
 아이콘 찾아볼떈 https://icons.expo.fyi/
 
-1. expo는 리엑트의 create-react-app 과 똑같다 보며니됨.. 리엑트 네이티브를 간편하게 설치할수있게해줌
-   또한 expo가 리엑트native를 안드로이드 ios에서 사용할수있게 해줌 2. ReactNativeCLI 사용하면 맥에서 ios, 원도우에서 안드로이드 개발만 가능.. 또한 설정도 쉽게 할수있음..
-   EXPO GO는 테스트를 할수있다
+1.  expo는 리엑트의 create-react-app 과 똑같다 보며니됨.. 리엑트 네이티브를 간편하게 설치할수있게해줌
+    또한 expo가 리엑트native를 안드로이드 ios에서 사용할수있게 해줌 2. ReactNativeCLI 사용하면 맥에서 ios, 원도우에서 안드로이드 개발만 가능.. 또한 설정도 쉽게 할수있음..
+    EXPO GO는 테스트를 할수있다
 
-   단점 : 한계가 있다.. expo로 블루투스 같은걸 할수없어 android, IOS 새로 다 깔아서 해야함
-   그리고 배포할떄 SDK를 다 포함해서 무거워진다! 수많은 API가 포함된다!
+    단점 : 한계가 있다.. expo로 블루투스 같은걸 할수없어 android, IOS 새로 다 깔아서 해야함
+    그리고 배포할떄 SDK를 다 포함해서 무거워진다! 수많은 API가 포함된다!
 
-2. 그래서 우리는 expo와 xcode, androidstudio 의 장점들만 이용해볼것임! managed workflow이용해서
-   양쪽 장점들만 eject(꺼내오기) 해서 사용하면됨!
-   그래서 nativeCLI로 시작해서 expo의 좋은 기능을 꺼내올것임!!
-   managed workflow는 리액트 네이티브를 위핸 create React app 이고 bear workflow는 완전히 컨트롤 가능
-   하지만 이때문에 조금 복잡해질수있음
-   managed workflow ? bear workflow? 가능한 범위가있는데 우리는 둘다 가능한 범위내에서 할것임!
-   우리는 managed workflow로 시작해서 bear workflow로 끝낼것임(둘다 사용가능한 범위)
-   expo에서 어떤 네이티브 코드도 돌리지 않도록 해야함!!(블루투스 같은거 엑스포는 안됨)
+2.  그래서 우리는 expo와 xcode, androidstudio 의 장점들만 이용해볼것임! managed workflow이용해서
+    양쪽 장점들만 eject(꺼내오기) 해서 사용하면됨!
+    그래서 nativeCLI로 시작해서 expo의 좋은 기능을 꺼내올것임!!
+    managed workflow는 리액트 네이티브를 위핸 create React app 이고 bear workflow는 완전히 컨트롤 가능
+    하지만 이때문에 조금 복잡해질수있음
+    managed workflow ? bear workflow? 가능한 범위가있는데 우리는 둘다 가능한 범위내에서 할것임!
+    우리는 managed workflow로 시작해서 bear workflow로 끝낼것임(둘다 사용가능한 범위)
+    expo에서 어떤 네이티브 코드도 돌리지 않도록 해야함!!(블루투스 같은거 엑스포는 안됨)
 
-3. - npm install --global expo-cli
-   - expo init NewKwangStagram_mobile
-     managed workflow에서 blank로 갈것임.
-   - expo install expo-app-loading 또는.. npm i --save-dev @types/expo-app-loading
-     (뭔가 인스톨할때 앱 멈추게안한다)
-   - expo install expo-font
-   - expo install expo-asset asset에 있는 친구를 쓰기위해
-   - npm install @react-navigation/native (네비게이션)
-   - expo install react-native-gesture-handler react-native-reanimated react-native-screens react-native-safe-area-context @react-native-community/masked-view(한줄로 만들어서 인스톨)
-   - npm install @react-navigation/stack
-   - npm install styled-components
-   - expo install react-native-appearance
-   - npm install react-hook-form
-   - npm install @apollo/client graphql
-   - npm install @react-navigation/bottom-tabs
-   - expo install @react-native-async-storage/async-storage
+3.  - npm install --global expo-cli
+    - expo install @react-native-async-storage/async-storage
+    - expo install expo-app-loading 위에꺼랑 이거 설치..자꾸 삭제됨..
+    - expo init NewKwangStagram_mobile
+      managed workflow에서 blank로 갈것임.
+      (뭔가 인스톨할때 앱 멈추게안한다)
+    - expo install expo-font
+    - expo install expo-asset asset에 있는 친구를 쓰기위해
+    - npm install @react-navigation/native (네비게이션)
+    - expo install react-native-gesture-handler react-native-reanimated react-native-screens react-native-safe-area-context @react-native-community/masked-view(한줄로 만들어서 인스톨)
+    - npm install @react-navigation/stack
+    - npm install styled-components
+    - expo install react-native-appearance
+    - npm install react-hook-form
+    - npm install @apollo/client graphql
+    - npm install @react-navigation/bottom-tabs
+    - npm install @react-navigation/material-top-tabs react-native-tab-view@^2.16.0
+    - expo install expo-media-library
+    - expo install expo-camera
+    - expo install @react-native-community/slider
 
-4. view는 div고 text는 span임!
+4.  view는 div고 text는 span임!
 
-5. preload를 준비해야한다. 유저는 앱에 들어갈때 모든게 준비될떄 봐야하는데..
-   그래서 로딩동안 볼 화면이 필요하다!
-   프리로딩동안 예를들어 폰트준비, api준비 등을 할수있다,
-   그리고 preload가 끝나면 onFinish가 발동되어 loading state를 false로 바꿔 앱을 실행한다!
+5.  preload를 준비해야한다. 유저는 앱에 들어갈때 모든게 준비될떄 봐야하는데..
+    그래서 로딩동안 볼 화면이 필요하다!
+    프리로딩동안 예를들어 폰트준비, api준비 등을 할수있다,
+    그리고 preload가 끝나면 onFinish가 발동되어 loading state를 false로 바꿔 앱을 실행한다!
 
-6. 네비게이션을 하기위한 방법은 3가지가 있다
+6.  네비게이션을 하기위한 방법은 3가지가 있다
 
-   - stack => 버튼눌러서 쌓이는 네비, Container 가 필요하고 그안에 stack.navigator 가 필요하다
-     전체 영향줄때는 stack.Navigator에 주면되고 하나의 화면에영향줄떄는 options에 넣으면됨
-   - tabs => 하단에 보이는 네비
-   - drawer
+    - stack => 버튼눌러서 쌓이는 네비, Container 가 필요하고 그안에 stack.navigator 가 필요하다
+      전체 영향줄때는 stack.Navigator에 주면되고 하나의 화면에영향줄떄는 options에 넣으면됨
+    - tabs => 하단에 보이는 네비
+    - drawer
 
-7. 라우트 이동방법은
-   <TouchableOpacity onPress={() => navigation.navigate("CreateAccount")}>
-   인데 "" 안에 들어가는건 name이 들어가면된다
-   <Stack.Screen name="Welcome" component={Welcome} />
+7.  라우트 이동방법은
+    <TouchableOpacity onPress={() => navigation.navigate("CreateAccount")}>
+    인데 "" 안에 들어가는건 name이 들어가면된다
+    <Stack.Screen name="Welcome" component={Welcome} />
 
-8. npm install styled-components
+8.  npm install styled-components
 
-   - styled components 프론트앤드와 다른점은
-     div대신에 View를 쓸꺼임 styled.View처럼,
+    - styled components 프론트앤드와 다른점은
+      div대신에 View를 쓸꺼임 styled.View처럼,
 
-9. expo install react-native-appearance
-   다크모드나 라이트 모드 설정하기위해서는 이부분이 필요함
-   "userInterfaceStyle": "automatic",
-   json에 설정 자세한건 14.3
+9.  expo install react-native-appearance
+    다크모드나 라이트 모드 설정하기위해서는 이부분이 필요함
+    "userInterfaceStyle": "automatic",
+    json에 설정 자세한건 14.3
 
 10. flex: 1는 네이티브에서만 작동 화면을 꽉채움
     flex 기본 direction은 column임
@@ -224,4 +228,43 @@
 
 41. {조건문 ? (A : (조건문 ? (B : C))): D} 도가능
 
-42.
+42. 사진업로드 화면을 위해서..
+    다시 스택 안속에 탭네비게이션 넣고 그 탭네비안에 다른스택이 존재함
+    즉 첫번쨰 스택은 우리가 탭네비게이션 넣은곳
+    두번째 스택은 우리의 upload파트가 될것임
+    즉
+    stack -> tabs -> stacks
+    stack(upload)
+    이유는 우리가 카메라 클릭시, 다른 카메라 화면으로 넘어 가고 싶기 떄문
+
+43. npm install @react-navigation/material-top-tabs react-native-tab-view@^2.16.0
+    사진찍는 화면을 위해서 다른 네비게이션 다운받음
+
+44. expo install expo-media-library 를 통해 우리가 사진들을 불러올수있음!
+
+45. <a><b/><c/></a> 가있을때 a에 flex:1 주고 b,c에도 각각 flex:1 주면 전체화면에 절반씩 bc가 가져감
+
+46. expo install expo-camera
+
+47. expo install @react-native-community/slider 카메라 줌기능위해 설치
+
+48. <StatusBar hidden={true} />
+    {/* 시계나오고 배터리나오는부분이다 */}
+
+49. takePictureAsync 통해 사진을 찍고 uri가 반환되는데 캐쉬에 저장되어있다
+    이 캐쉬에 저장된 친구를 잠시 미리보기로 나두고 내 사진첩에 저장할지는 옵션을 유저한테 물어
+    결정할수있게 만들어야한다
+
+50. 우리는 리턴없이 사진찍고 Alert를 이용하여 yes or no에 따라
+    await MediaLibrary.saveToLibraryAsync(takenPhoto) 친구를 이용하여 바로 저장할것임
+
+51. 사진 선택화면에 가면.. 카메라도 자동으로 바로켜진다. 그래서 우리는 useIsFocused라는 친구를
+    쓸껀데.. 이친구를 통해 카메라 화면에만 focus 됐을때 카메라가 켜지게 만들것임!
+    또한 베터리 잔량도.. 사진select일때는 베터리 화면보여주고 싶고, 사진찍을떄는 없애고 싶은데
+    useIsFocused이용해 조절할수있음 버그가 있어서 이렇게 했음.. 저렇게안하면 둘다 안뜨거나 둘다뜸
+    {isFocused ? <StatusBar hidden={true} /> : null}
+    즉!!!!! 화면들은 이미 내가 앱키는순간 작동되는데.. 저 포커스를 사용해 특정 화면에 왔을떄만
+    작동하는 기능을 미리 구현안하고 기다리다 그순간이 되면 실행 하게 할수있음!
+    근데(카메라 는 설정안해줬음..해줘야 미리 안켜짐)
+
+52.
