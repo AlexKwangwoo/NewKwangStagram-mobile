@@ -1,10 +1,10 @@
-import React from "react";
-import { FlatList, Text, View } from "react-native";
 import Photo from "../components/Photo";
 import ScreenLayout from "../components/ScreenLayout";
 import { gql, useQuery } from "@apollo/client";
 import { COMMENT_FRAGMENT, PHOTO_FRAGMENT } from "../fragments";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { FlatList, TouchableOpacity, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 const FEED_QUERY = gql`
   query seeFeed($offset: Int!) {
@@ -27,7 +27,7 @@ const FEED_QUERY = gql`
   ${COMMENT_FRAGMENT}
 `;
 
-export default function Feed() {
+export default function Feed({ navigation }) {
   const { data, loading, refetch, fetchMore } = useQuery(FEED_QUERY, {
     //fetchMore 은 더많은 결과를 새로운 변수와 함께 fetch할수있게 해줌
     //또한 기존의 데이터를 유지한체 새로운 데이터를 가져옴!
@@ -49,6 +49,20 @@ export default function Feed() {
     setRefreshing(false);
   };
   const [refreshing, setRefreshing] = useState(false);
+
+  const MessagesButton = () => (
+    <TouchableOpacity
+      style={{ marginRight: 25 }}
+      onPress={() => navigation.navigate("Messages")}
+    >
+      <Ionicons name="paper-plane" color="white" size={20} />
+    </TouchableOpacity>
+  );
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: MessagesButton,
+    });
+  }, []);
 
   return (
     <ScreenLayout loading={loading}>

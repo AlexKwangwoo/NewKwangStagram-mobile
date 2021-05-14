@@ -51,14 +51,15 @@ export default function App() {
 
     //문제는 다른사람 로그인하면..이전사람들캐쉬보여서 캐쉬리셋해야한다
     // client.clearStore(); 통해 로그아웃시 지워줄것임! 근데 오류가생기네... 했다가 다시잘됨
-    await persistCache({
-      cache,
-      //아폴로에서 우리가 만든 캐쉬를 가져온다!
-      storage: new AsyncStorageWrapper(AsyncStorage),
-      serialize: false,
-      //내가 스키마 좀 바꿔주면 에러생기는데 여길통해 통과시켜준다
-      //캐쉬가 자동업데이트되게할려면 저렇게 해야함..
-    });
+    // await persistCache({
+    //   cache,
+    //   //아폴로에서 우리가 만든 캐쉬를 가져온다!
+    //   storage: new AsyncStorageWrapper(AsyncStorage),
+    //   serialize: false,
+    //   //내가 스키마 좀 바꿔주면 에러생기는데 여길통해 통과시켜준다
+    //   //캐쉬가 자동업데이트되게할려면 저렇게 해야함..
+    // });
+    //persistance 일단취소.. 메시지에서 캐쉬쓸떄 오류가 많이남
 
     return preloadAssets();
     //preloadAssets은 promise를 리턴해야함

@@ -12,6 +12,8 @@ import {
   CachePersistor,
   persistCache,
 } from "apollo3-cache-persist";
+import { onError } from "@apollo/client/link/error";
+import { createUploadLink } from "apollo-upload-client";
 
 export const isLoggedInVar = makeVar(false);
 //새로고침시 디폴트는 항상 false.. 그래서 토큰유무에따라 바꿔줘야함 app,js에서
@@ -36,14 +38,17 @@ export const logUserIn = async (token) => {
 };
 
 export const logUserOut = async () => {
+  client.clearStore();
   await AsyncStorage.removeItem(TOKEN);
   isLoggedInVar(false);
   tokenVar(null);
-  client.clearStore();
   //clear를 통해 로그아웃시 모든 캐쉬내역 삭제!!
+  //나갔다오면 유지시키는거 패스.. 메시지에서 캐쉬오류가 많이남
 };
 
-const httpLink = createHttpLink({
+// const httpLink = createHttpLink({
+const uploadHttpLink = createUploadLink({
+  //업로드를위해 httplink를 업로드+httpLink가 포함된 createUploadLink를 사용함
   uri: "http://192.168.1.68:4000/graphql",
   //https://sharp-shrimp-59.loca.lt/graphql
   ////192.168.1.68:19000 여기 숫자로 해야할듯
@@ -66,8 +71,21 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
+const onErrorLink = onError(({ graphQLErrors, networkError }) => {
+  //여길 통해 우리가 어떤 애러가 어디서 일어나는지 좀더 자세하게 볼수있음
+  if (graphQLErrors) {
+    console.log(`GraphQL Error`, graphQLErrors);
+  }
+  if (networkError) {
+    console.log("Network Error", networkError);
+  }
+});
+
 export const cache = new InMemoryCache({
   typePolicies: {
+    // Message: {
+    //   keyFields: (obj) => `Message:${obj.id}`,
+    // },
     Query: {
       fields: {
         seeFeed: offsetLimitPagination(),
@@ -82,7 +100,10 @@ export const cache = new InMemoryCache({
 });
 
 const client = new ApolloClient({
-  link: authLink.concat(httpLink),
+  link: authLink.concat(onErrorLink).concat(uploadHttpLink),
+  // httpLink를 우리가 앞에 안쓰는 이유는 마지막에 거치는 링크기때문이다
+  // 종료되는 링크이기에.. 마지막에 안써주면 종료 링크가 없다 오류뜬다!
+  // 에러생기는걸 보기위해서는 onErrorLink를 포함해줘야함
   cache,
 });
 

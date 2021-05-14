@@ -134,7 +134,7 @@ function Photo({ id, user, caption, file, isLiked, likes }) {
         resizeMode="cover"
         style={{
           width,
-          height: imageHeight,
+          height: imageHeight - `${imageHeight <= 500 ? 0 : imageHeight - 400}`,
           // 사진 너무 크면 maximum 사이즈 조절하면된다
           // height: height - `${Platform.OS === "ios" ? 500 : 300}`,
         }}

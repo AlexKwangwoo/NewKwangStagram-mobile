@@ -1,5 +1,8 @@
 아이콘 찾아볼떈 https://icons.expo.fyi/
 
+중요!!!!!!!gql`` 쓸떄 id를 왠만하면 가져와주자 그렇게 해야 아폴로 캐쉬가
+Photo:1 Room:1 이런식으로 아이디를 줘서 나중에 우리가 캐쉬 업데이트하기가 쉬워짐!!
+
 1.  expo는 리엑트의 create-react-app 과 똑같다 보며니됨.. 리엑트 네이티브를 간편하게 설치할수있게해줌
     또한 expo가 리엑트native를 안드로이드 ios에서 사용할수있게 해줌 2. ReactNativeCLI 사용하면 맥에서 ios, 원도우에서 안드로이드 개발만 가능.. 또한 설정도 쉽게 할수있음..
     EXPO GO는 테스트를 할수있다
@@ -267,4 +270,68 @@
     작동하는 기능을 미리 구현안하고 기다리다 그순간이 되면 실행 하게 할수있음!
     근데(카메라 는 설정안해줬음..해줘야 미리 안켜짐)
 
-52.
+52. ...(loading && { headerLeft: () => null }),
+    이게 만약 loading중이면 headerLeft를 눌로하겠다는거와 똑같은 조건문임!
+
+53. mutation uploadPhoto($file: Upload!, $caption: String) {
+    프론트엔드와 모바일은 저기서 Upload! 형식이 뭔지 모른다.. 그래서 해결해줘야함
+
+54. file 업로드를 위해 npm i apollo-upload-client 가 필요
+    왜냐하면 우리는 프리즈마에서 제공한 Upload라는 type을 해결해야하기에.. 저걸 써야함!
+    문제가있는데 http link는 file업로드 형식을 제대로 이해하지못해 뭔가 해줘야함!
+    const uploadHttpLink = createUploadLink({
+    //업로드를위해 httplink를 업로드+httpLink가 포함된 createUploadLink를 사용함
+    이걸로 해결했음!
+
+55. const client = new ApolloClient({
+    link: authLink.concat(onErrorLink).concat(httpLink),
+    // httpLink를 우리가 앞에 안쓰는 이유는 마지막에 거치는 링크기때문이다
+    // 종료되는 링크이기에.. 마지막에 안써주면 종료 링크가 없다 오류뜬다!
+    // 에러생기는걸 보기위해서는 onErrorLink를 포함해줘야함
+    cache,
+    });
+
+56. message는 Upload와 같이.. 베이스 스택에서 출발함!
+    즉 업로드화면, 탭화면, 업로드폼화면, 메시지 이렇게 4개가 베이스 스택임
+    그래서 메시지 안에서 다시 스택네비게이터가 시작해 헤더가 두개되는데 하나 없애줄것임
+
+57. <FlatList
+    inverted
+    // inverted 는 밑에서부터 내용을 생성할것임
+
+58. KeyboardAvoidingView 를 사용하여 대화입력시 키보드떄문에 가져리는 현상을 막는다
+
+59. flex-direction: ${(props) => (props.outGoing ? "row-reverse" : "row")}; 이걸
+    통해서 메시지 좌우 나눠서 보이게가능!
+
+60. 중요!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    사진은 내가 이미 보낸정보가 캐쉬에 자동 저장(메소드통해)됐기때문에 우리가 오브젝트 저장을 할필요없었는데
+    코맨드는 우리가 직접 오브젝트 형태로 저장해줘야한다! 왜냐하면 예전처럼 사진을 올렸을때
+    모든객체를 가져온것처럼 할수있겠지만 메시지는 모든 객체를 가져오진않기에 오브젝트 만들어야함
+    우리는 id만 받기떄문에..
+    data: {
+    sendMessage: { ok, id },<---여기!!!
+    },
+    } = result;
+    if (ok && meData) {
+    const { message } = getValues();
+    const messageObj = { <--그래서 여기를 다 작성해줘야함!!
+
+61. seeRoom(id: $id) {
+    id
+
+    # id 필수로 넣어줘야함.. 그래야 Room:2 <- 이렇게 아폴로캐쉬가 구분해줌!!
+
+    apollo가 id를 갖고 있는 message들을 포함하고있는 Room이 있단걸 알수있음
+    프론트 앤드에서도 이와같은걸 비슷하게했었음!
+
+62. inverted통해 메시지를 밑에서 부터 보여주는데.. 제일 최근꺼부터 밑에서부터 위로 간다..
+    그래서 메시지 전체 순서를 바꿔줘야한다!
+    그래서 data={data.seeRoom.message.reverse()} 할려는데 여긴 read-only?라서 배열이 고정됨
+
+63. const messages = [...(data?.seeRoom?.messages ?? [])];
+    //...(data?.seeRoom?.messages이부분은 우리가 메시지 순서를 바꿀수없는 읽기 전용임
+    //그래서 다른 어레이로 복사할것임
+    //저 문법해석하면.. 만약 데이터 씨룸 메시지가 있다면 그걸 배열안에 펼쳐줄거고
+    //만약 없다면 빈배열을 줄것임.. 점세개는 우리가 배열을 들고있어야 풀수있음
+    왜냐하면 저 메시지 받는곳이 renderItem이라 이친구는 배열을 받기떄문!!
