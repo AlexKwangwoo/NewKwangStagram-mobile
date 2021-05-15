@@ -1,7 +1,29 @@
 아이콘 찾아볼떈 https://icons.expo.fyi/
 
+expo를 사용하면 덩치가 엄청 커지는데.. 그대신 엑스포 통해서 안드로이드 ios 다 해볼수있음
+개인 개발자 연습 입장에서는 훌륭하지만 회사에서는 안씀 너무 파일이 큼
+
 중요!!!!!!!gql`` 쓸떄 id를 왠만하면 가져와주자 그렇게 해야 아폴로 캐쉬가
 Photo:1 Room:1 이런식으로 아이디를 줘서 나중에 우리가 캐쉬 업데이트하기가 쉬워짐!!
+
+    --중요!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    connectionParams: {
+    token: tokenVar(),
+    }, 얘는 한번만 실행되지만
+
+    connectionParams: () => ({
+    token: tokenVar(),
+    }), 얘는 계속 실행되게 만드는 거임!!
+
+    useMutation(
+    SEND_MESSAGE_MUTATION,
+    {
+      update: updateSendMessage,
+      //캐쉬바로접근가능하게함!!
+    }
+
+    못할때는 const client = useApolloClient(); 이걸로 해준다음 client.cache로 접근해야함
+    room에 가면 있음!!
 
 1.  expo는 리엑트의 create-react-app 과 똑같다 보며니됨.. 리엑트 네이티브를 간편하게 설치할수있게해줌
     또한 expo가 리엑트native를 안드로이드 ios에서 사용할수있게 해줌 2. ReactNativeCLI 사용하면 맥에서 ios, 원도우에서 안드로이드 개발만 가능.. 또한 설정도 쉽게 할수있음..
@@ -39,6 +61,7 @@ Photo:1 Room:1 이런식으로 아이디를 줘서 나중에 우리가 캐쉬 �
     - expo install expo-media-library
     - expo install expo-camera
     - expo install @react-native-community/slider
+    - npm install @apollo/client subscriptions-transport-ws
 
 4.  view는 div고 text는 span임!
 
@@ -335,3 +358,24 @@ Photo:1 Room:1 이런식으로 아이디를 줘서 나중에 우리가 캐쉬 �
     //저 문법해석하면.. 만약 데이터 씨룸 메시지가 있다면 그걸 배열안에 펼쳐줄거고
     //만약 없다면 빈배열을 줄것임.. 점세개는 우리가 배열을 들고있어야 풀수있음
     왜냐하면 저 메시지 받는곳이 renderItem이라 이친구는 배열을 받기떄문!!
+
+64. 실시간 npm install @apollo/client subscriptions-transport-ws
+
+65. connectionParams: () => ({
+    //connectionParams을 통해 webSocket의 context에 토큰을 실어 보낼수있음..딱한번만보내고 계속저장됨
+    token: tokenVar(), 아폴로js통해서 넣고 있는데
+    백앤드가보니..토큰이 텅텅 비었다.. 그래서 실시간이 안됨
+    그이유는 connectionParams는 tokenVar()를 가져오기위해서는 기다려야하는데.. 안기다리고 먼저 만들어
+    지기 떄문이다. http는 항상 토큰이 포함되어 나가기에 괜찮지만, 웹소캣은 한번만 만들어지는데
+    그 한번만들어질때 안넣어주면 실시간 영영 안나옴!
+
+    connectionParams: {
+    token: tokenVar(),
+    }, 얘는 한번만 실행되지만
+
+    --중요!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    connectionParams: () => ({
+    token: tokenVar(),
+    }), 얘는 계속 실행되게 만드는 거임!!
+
+    아마 onClick = {submit}, onClick = {()=>submit()} 이 다른이유는 이거일듯..

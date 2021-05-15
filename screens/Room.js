@@ -1,4 +1,10 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import {
+  gql,
+  useApolloClient,
+  useMutation,
+  useQuery,
+  useSubscription,
+} from "@apollo/client";
 import React, { useEffect } from "react";
 import { FlatList, KeyboardAvoidingView, View } from "react-native";
 import ScreenLayout from "../components/ScreenLayout";
@@ -6,6 +12,20 @@ import styled from "styled-components/native";
 import { useForm } from "react-hook-form";
 import useMe from "../hooks/useMe";
 import { Ionicons } from "@expo/vector-icons";
+
+const ROOM_UPDATES = gql`
+  subscription roomUpdates($id: Int!) {
+    roomUpdates(id: $id) {
+      id
+      payload
+      user {
+        username
+        avatar
+      }
+      read
+    }
+  }
+`;
 
 const SEND_MESSAGE_MUTATION = gql`
   mutation sendMessage($payload: String!, $roomId: Int, $userId: Int) {
@@ -155,14 +175,90 @@ export default function Room({ route, navigation }) {
     SEND_MESSAGE_MUTATION,
     {
       update: updateSendMessage,
+      //캐쉬바로접근가능하게함!!
     }
   );
 
-  const { data, loading } = useQuery(ROOM_QUERY, {
+  //useSubscription같은 훅있지만 subscirbToMore쓰는이유는 캐쉬접근 가능하게 해줌!@!
+  //근데 바로 불러올수가 없어서 useEffect를 써줘야한다!
+  const { data, loading, subscribeToMore } = useQuery(ROOM_QUERY, {
+    //subscribeToMore 통해서 실시간
+    // ROOM_QUERY를 통해 방메시지 정보등을 가져온다! 그다음 실시간이 useEffect에의해
+    //  작동될것임
     variables: {
       id: route?.params?.id,
     },
   });
+
+  const client = useApolloClient();
+  const updateQuery = (prevQuery, options) => {
+    //prevQuery는 필요없음.. 이전꺼 안중요..미래에올 데이터가 중요!
+    //
+    console.log("options", options);
+
+    const {
+      subscriptionData: {
+        data: { roomUpdates: message },
+        //subscriptionData속에 data속에 roomUpdatees가 있고 그친구 이름을 message라고 하겠음!
+      },
+    } = options;
+
+    if (message.id) {
+      const incomingMessage = client.cache.writeFragment({
+        fragment: gql`
+          fragment NewMessage on Message {
+            id
+            payload
+            user {
+              username
+              avatar
+            }
+            read
+          }
+        `,
+        data: message,
+        //message는 캐쉬에 덮어주기 똑같은 파일 형식이라 가능하다!
+      });
+
+      client.cache.modify({
+        id: `Room:${route.params.id}`,
+        fields: {
+          messages(prev) {
+            const existingMessage = prev.find(
+              (aMessage) => aMessage.__ref === incomingMessage.__ref
+              //룸에 Messages가면 각 메시지들이 ref하는곳들이 있는데
+              //ex) message1-> __ref = Message.105 이런식임
+              //그 ref가 똑같다면 추가 해줘선 안된다... 이렇게 하는이유는
+              //많은 이벤트들이 중복 겹치는데.. 고급 subsciption버전 사용하지 않는이상
+              //문제가 생길수있따.. 그래서 그냥 이렇게 중복되는걸 추가안할것임
+              //걍 아직 프로그램 상 문제임.. 메모리부족 버그..
+            );
+            if (existingMessage) {
+              return prev;
+            }
+            return [...prev, incomingMessage];
+          },
+        },
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (data?.seeRoom) {
+      // console.log("메시지방 데이터", data.seeRoom);
+      // 그방에 들어갈때만 데이터를 가져옴!
+      subscribeToMore({
+        //ROOM_QUERY 쿼리가 작동되어 data를 받으면 실행될것임!
+        document: ROOM_UPDATES,
+        variables: {
+          id: route?.params?.id,
+        },
+        updateQuery,
+        //updateQuery 는 나의 실시간에 새로운 업데이트가 있을때 호출되는 함수임!
+      });
+      //여기를 통해 이제 방에서 subscribe를 실시할것임!!
+    }
+  }, [data]);
 
   const onValid = ({ message }) => {
     if (!sendingMessage) {

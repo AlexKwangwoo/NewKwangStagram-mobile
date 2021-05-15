@@ -3,10 +3,14 @@ import {
   createHttpLink,
   InMemoryCache,
   makeVar,
+  split,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { offsetLimitPagination } from "@apollo/client/utilities";
+import {
+  getMainDefinition,
+  offsetLimitPagination,
+} from "@apollo/client/utilities";
 import {
   AsyncStorageWrapper,
   CachePersistor,
@@ -14,6 +18,7 @@ import {
 } from "apollo3-cache-persist";
 import { onError } from "@apollo/client/link/error";
 import { createUploadLink } from "apollo-upload-client";
+import { WebSocketLink } from "@apollo/client/link/ws";
 
 export const isLoggedInVar = makeVar(false);
 //새로고침시 디폴트는 항상 false.. 그래서 토큰유무에따라 바꿔줘야함 app,js에서
@@ -60,6 +65,17 @@ const uploadHttpLink = createUploadLink({
   // http://localhost:4000/graphql
 });
 
+const wsLink = new WebSocketLink({
+  uri: "ws://192.168.1.68:4000/graphql",
+  options: {
+    // reconnect: true,
+    connectionParams: () => ({
+      //connectionParams을 통해 webSocket의 context에 토큰을 실어 보낼수있음..딱한번만보내고 계속저장됨
+      token: tokenVar(),
+    }),
+  },
+});
+
 const authLink = setContext((_, { headers }) => {
   //백엔드에 토큰을 전달 해야만 한다!
   //setContext를 통해 넣어줄수있음
@@ -99,8 +115,26 @@ export const cache = new InMemoryCache({
   },
 });
 
+const httpLinks = authLink.concat(onErrorLink).concat(uploadHttpLink);
+
+const splitLink = split(
+  //언제 웹소캣 쓸지 언제 http 링크쓸지 알아야함!
+
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === "OperationDefinition" &&
+      definition.operation === "subscription"
+    );
+  }, //여기가 맞다면 웹소캣을 반환함.. 아니면 http반환!
+  wsLink,
+  httpLinks
+);
+
 const client = new ApolloClient({
-  link: authLink.concat(onErrorLink).concat(uploadHttpLink),
+  link: splitLink,
+
+  // link: authLink.concat(onErrorLink).concat(uploadHttpLink),
   // httpLink를 우리가 앞에 안쓰는 이유는 마지막에 거치는 링크기때문이다
   // 종료되는 링크이기에.. 마지막에 안써주면 종료 링크가 없다 오류뜬다!
   // 에러생기는걸 보기위해서는 onErrorLink를 포함해줘야함
